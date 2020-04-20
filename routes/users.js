@@ -14,7 +14,7 @@ const confirmation = require('../middleware/confirmation');
 router.get("/", [auth, admin], userController.getUsers);
 //TODO: image resize remaining
 router.post("/profile-image-upload", uploadController.singleUpload); // RESIZE?? or do it at fron css
-router.get("/:id", auth, userController.getUser);
+router.get("/me", auth, userController.getUser);
 
 //USER ROUTE
 router.post("/add-user", userController.createUser, nodemailerverifyEmail);
@@ -29,11 +29,11 @@ router.post("/unfollow-user", userController.deleteFollowing);
 router.get("/get-posts/search", postController.getPostsWithQuery);
 router.get("/get-post/:id", postController.getPost);
 router.get("/get-posts", postController.getPosts);
-router.post("/add-post", [auth, fliter, uploadController.singleUpload, deactivateaccount], postController.createPost);
+router.post("/add-post", [auth, uploadController.singleUpload, deactivateaccount], postController.createPost);
 router.delete("/delete-post/:id", postController.deletePost);
 router.post("/comment-post", auth, postController.commentPost);
 router.put("/edit-post/:id", [auth, uploadController.singleUpload, fliter, deactivateaccount], postController.updatePost);
 //TODO
-router.post("/like-post", uploadController.singleUpload);
+router.post("/like-post", auth, postController.likePost);
 
 module.exports = router;

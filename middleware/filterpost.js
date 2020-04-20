@@ -14,14 +14,6 @@ module.exports = async function (req, res, next) {
   const unhealthyWordsQuery = await UnhealthyWords.find();
   let unhealthyWords = [];
   unhealthyWordsQuery.forEach((word) => unhealthyWords.push(word.word));
-
-  const blockedWordList = unhealthyWords;
-  console.log("the  post input is: ", req.body.content);
-  console.log("the  unhealthyWords input is: ", blockedWordList);
-
-  const unhealthyWordsQuery = await UnhealthyWords.find();
-  let unhealthyWords = [];
-  unhealthyWordsQuery.forEach((word) => unhealthyWords.push(word.word));
   const isUnhealthy = searchUnhealthyWord(req.body.content, unhealthyWords);
 
   //Bad word detected: change post health and visibility status and notify admin

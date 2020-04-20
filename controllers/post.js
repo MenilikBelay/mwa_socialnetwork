@@ -1,6 +1,7 @@
 const { Post } = require("../models/post");
 const { User } = require("../models/user");
 const ApiResponse = require('../models/api.response');
+const mongoose  = require('mongoose');
 
 
 /**
@@ -89,16 +90,19 @@ exports.createPost = async (req, res, next) => {
 exports.getPosts = async (req, res, next) => {
   const { page = 1, pagesize = 2 } = req.query;
   try {
-    const posts = await Post.find().populate('owner') //.populate({ path: 'comments.commentedBy', model: 'User'})
+    const posts = await Post.find()
+      .populate("owner")
+      .populate({ path: "comments.commentedBy", model: "User" })
       .limit(pagesize * 1)
       .skip((page - 1) * pagesize)
+      .sort({ postTime: -1 })
       .exec();
     const count = await Post.countDocuments();
     res.status(200).json({
       posts,
       totalPages: Math.ceil(count / pagesize),
       currentPage: page,
-      maxPosts: count
+      maxPosts: count,
     });
   } catch (err) {
     console.error(err.message);
@@ -156,24 +160,30 @@ exports.likePost = async (req, res, next) => {
   // get user from request
   // get post from request body -- id
   const postId = req.body.postId;
+
   const user = req.user;
+  console.log("user",user);
+  console.log("postId",postId);
   if (!(postId && user)) {
     return res.status(404).json({ message: "Invalid request" });
   }
   const post = await Post.findById(postId);
+  console.log("post",post);
   if (!post) {
     return res.status(404).json({ message: "Post not found" });
   }
   if (post.likedBy.indexOf(user._id) === -1) {
     // add the like
-    Post.updateOne({ _id: post._id }, { $addToSet: { likedBy: user._id } });
+    // Post.updateOne({ _id: post._id }, { $addToSet: { likedBy: user._id } });
+    Post.updateOne({ _id: post._id }, { $push: { likedBy: mongoose.Types.ObjectId(user._id)}}).then(()=>{
+      res.status(200).json({ message: "Success" });
+    }).catch((err)=> console.log(err));
   } else {
     // remove the like
     await Post.updateOne({ _id: post._id }, { $pull: { likedBy: user._id } });
   }
   res.status(200).json({ message: "Success" });
 };
-
 exports.dislikePost = async (req, res, next) => {
   // get user
 };
