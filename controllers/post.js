@@ -66,7 +66,7 @@ exports.createPost = async (req, res, next) => {
   // post = new Post(_.pick(req.body, ['owner','content']));
   const post = new Post({
     content: req.body.content,
-    imagePath: url + "/images/" + req.file.filename,
+    // imagePath: url + "/images/" + req.file.filename,
     owner: req.user._id,
   });
 
@@ -77,7 +77,7 @@ exports.createPost = async (req, res, next) => {
     post: {
       id: this.createPost._id,
       content: this.createPost.content,
-      imagePath: this.createPost.imagePath,
+      // imagePath: this.createPost.imagePath,
     },
   });
 };
